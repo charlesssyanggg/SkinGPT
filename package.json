@@ -1,14 +1,12 @@
 {
-  "name": "react-example",
+  "name": "skingpt-pro",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build",
-    "start": "node dist/server.js",
-    "preview": "vite preview",
-    "clean": "rm -rf dist",
+    "vercel-build": "npm run build",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
@@ -38,7 +36,6 @@
     "autoprefixer": "^10.4.21",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "typescript": "~5.8.2"
   }
 }
