@@ -1,0 +1,95 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: /users/{userId}
+// Document ID: userId (UID)
+// Fields:
+//   - userId: string (required)
+//   - email: string (required)
+//   - displayName: string (optional)
+//   - photoURL: string (optional)
+//   - createdAt: string (format: date-time)
+//
+// Collection: /users/{userId}/skin_history/{scanId}
+// Document ID: auto-generated
+// Fields:
+//   - userId: string (required)
+//   - timestamp: string (required, format: date-time)
+//   - image: string (required, base64)
+//   - result: map (required, SkinAnalysisResult)
+//
+// Collection: /users/{userId}/ingredient_history/{scanId}
+// Document ID: auto-generated
+// Fields:
+//   - userId: string (required)
+//   - timestamp: string (required, format: date-time)
+//   - ingredients: string (optional)
+//   - result: map (required)
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "charlesssyanggg@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['userId', 'email']) &&
+             data.userId is string &&
+             data.email is string &&
+             data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidScan(data) {
+      return data.keys().hasAll(['userId', 'timestamp', 'result']) &&
+             data.userId == request.auth.uid &&
+             data.timestamp is string;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && 
+                      request.resource.data.userId == resource.data.userId; // userId is immutable
+      
+      match /skin_history/{scanId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidScan(request.resource.data);
+        allow update, delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /ingredient_history/{scanId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidScan(request.resource.data);
+        allow update, delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

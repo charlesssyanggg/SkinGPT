@@ -1,0 +1,8 @@
+{
+  "name": "Remix: SkinGPT Pro",
+  "description": "AI皮肤健康管家 - 一键拍照检测肤质，专业诊断、成分分析与科学产品推荐。集成厚海锐膜纳米科技，为你的肌肤提供精准修护方案。",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}

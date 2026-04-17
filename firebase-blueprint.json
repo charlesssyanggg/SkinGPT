@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Information about the authenticated user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email"]
+    },
+    "SkinScan": {
+      "title": "Skin Analysis Record",
+      "description": "Result of a skin analysis session.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "image": { "type": "string", "description": "Base64 image string" },
+        "result": { "type": "object", "description": "SkinAnalysisResult object" }
+      },
+      "required": ["userId", "timestamp", "result"]
+    },
+    "IngredientScan": {
+      "title": "Ingredient Analysis Record",
+      "description": "Result of an ingredient list analysis.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "ingredients": { "type": "string" },
+        "result": { "type": "object" }
+      },
+      "required": ["userId", "timestamp", "result"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document."
+    },
+    "/users/{userId}/skin_history/{scanId}": {
+      "schema": "SkinScan",
+      "description": "History of skin analyses for a specific user."
+    },
+    "/users/{userId}/ingredient_history/{scanId}": {
+      "schema": "IngredientScan",
+      "description": "History of cosmetic ingredient analyses for a specific user."
+    }
+  }
+}
