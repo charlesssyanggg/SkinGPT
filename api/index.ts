@@ -1,10 +1,8 @@
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -16,11 +14,11 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// API 路由
+// 所有的 API 逻辑都放在这里或从这里导入
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', firebase: 'connected' });
+  res.json({ status: 'ok', environment: 'vercel' });
 });
 
-// 在 Vercel 环境下，我们主要导出这个 app
-// 静态资源由 Vercel 的路由配置处理
+// 在 Vercel 中，我们不需要调用 app.listen()
+// Vercel 会自动处理请求的分发
 export default app;
