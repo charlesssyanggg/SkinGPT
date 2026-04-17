@@ -28,11 +28,17 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.resolve(__dirname, 'dist');
+    const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
-      res.sendFile(path.resolve(distPath, 'index.html'));
+      res.sendFile(path.join(distPath, 'index.html'));
     });
+  }
+
+  // On Vercel, we don't need to call listen, but we can export the app instead.
+  // For other environments like AI Studio, we still need app.listen.
+  if (process.env.VERCEL) {
+    return app;
   }
 
   app.listen(PORT, '0.0.0.0', () => {
@@ -41,6 +47,9 @@ async function startServer() {
       console.log(`Vite running in middleware mode`);
     }
   });
+
+  return app;
 }
 
-startServer();
+const appPromise = startServer();
+export default appPromise;
